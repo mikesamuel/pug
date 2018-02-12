@@ -110,7 +110,7 @@ function pug_style(val) {
     return out;
   } else {
     val += '';
-    if (val[val.length - 1] !== ';') 
+    if (val[val.length - 1] !== ';')
       return val + ';';
     return val;
   }
@@ -252,3 +252,38 @@ function pug_rethrow(err, filename, lineno, str){
     + '\n' + context + '\n\n' + err.message;
   throw err;
 };
+
+
+// Used by the experimental contextual autoescaper
+const autoesc = require('pug-autoesc');
+const filterUrl = function (x) {
+  if (x == null) { return x; }
+  return autoesc.filterNormalizeUri(x);
+};
+
+function filterAttribs(attrs) {
+  var result = null;
+  for (var key in attrs) {
+    var canonKey = key.toLowerCase();
+    // TODO: Use URI_ATTR_NAMES in context-update.js for full list.
+    var value;
+    if (canonKey === 'src' || canonKey === 'href') {
+      value = filterUrl(attrs[key]);
+    } else if (canonKey.substring(0, 2) === 'on') {
+      // TODO: recognize https://angular.io/api/platform-browser/SafeValue
+      value = '//zSafeHtmlz';
+    } else {
+      continue;
+    }
+    if (!result) {
+      result = Object.assign({}, attrs);
+    }
+    result[key] = value;
+  }
+  return result || attrs;
+}
+
+exports.autoescBuffer = autoesc.Buffer;
+exports.filterUrl = filterUrl;
+exports.filterAttribs = filterAttribs;
+

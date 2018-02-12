@@ -1,0 +1,17 @@
+{
+  "name": "pug-autoesc",
+  "version": "1.0.0",
+  "description": "Experimental hooks for contextual autoescaping in pug",
+  "keywords": [
+    "pug"
+  ],
+  "dependencies": {
+    "js-stringify": "^1.0.1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/pugjs/pug-autoesc.git#TODO"
+  },
+  "author": "Mike Samuel",
+  "license": "MIT"
+}

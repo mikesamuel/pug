@@ -5,7 +5,9 @@
   "keywords": [
     "pug"
   ],
-  "dependencies": {},
+  "dependencies": {
+    "pug-autoesc": "file:../pug-autoesc"
+  },
   "devDependencies": {
     "uglify-js": "^2.6.1"
   },

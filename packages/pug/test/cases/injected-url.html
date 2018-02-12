@@ -1,0 +1,21 @@
+
+<p>Injected URLs can run arbitrary code <a href="#zSafehtmlz">javascript:alert(1)//</a> but not in Pug.
+</p>
+<p>
+  JavaScript URLs that appear in a constant expression should be
+  treated as trusted.
+</p>
+<p><a href="javascript:alert(1)">Link with constant href</a></p>
+<p><a href="#zSafehtmlz">Constant href via ampersand</a>TODO: This is not ideal.</p>
+<p>
+  <a href="javascript:alert(1)">Static link not in pug syntax</a></p>
+<p><a href="#zSafehtmlz">Dynamic link not in pug syntax</a></p>
+<ul>
+  <li><a href="#zSafehtmlz">Concatenation</a></li>
+  <li><a href="#zSafehtmlz">Template string</a></li>
+  <li><a href="#zSafehtmlz">Unescaped concatenation</a></li>
+  <li><a href="#zSafehtmlz">Ampersand with map constructor</a></li>
+  <li><a href="#zSafehtmlz">Ampersand with expression</a></li>
+</ul>
+<script>javascript: alert('javascript:alert(1)\/\/')</script>
+

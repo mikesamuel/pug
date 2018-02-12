@@ -1,0 +1,45 @@
+mixin linkit(url)
+  a(href=url)= url
+
+//-
+  Use an opaque predicate to trick Constantinople into treating this as
+  requiring evaluation at render time
+- var js = Math.random() <= 2 ? "javascript:alert(1)//" : ""
+- var attributes = {}
+- attributes.href = js + '/'
+
+p Injected URLs can run arbitrary code #[+linkit(js)] but not in Pug.
+
+p
+  | JavaScript URLs that appear in a constant expression should be
+  | treated as trusted.
+p
+  a(href='javascript:alert(1)') Link with constant href
+p
+  a&attributes({ href: 'javascript:alert(1)' }) Constant href via ampersand
+  | TODO: This is not ideal.
+
+p
+  <a href="javascript:alert(1)">
+    | Static link not in pug syntax
+  </a>
+
+p
+  <a href="#{js}">
+    | Dynamic link not in pug syntax
+  </a>
+
+ul
+  li
+    a(href=js + '/') Concatenation
+  li
+    a(href=`${js}/`) Template string
+  li
+    a(href!=js + '/') Unescaped concatenation
+  li
+    a&attributes({href: js + '/'}) Ampersand with map constructor
+  li
+    a&attributes(attributes) Ampersand with expression
+
+script
+  | javascript: alert(#{js})

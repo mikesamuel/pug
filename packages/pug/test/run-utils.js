@@ -3,6 +3,7 @@ var assert = require('assert');
 var pug = require('../');
 var uglify = require('uglify-js');
 var mkdirp = require('mkdirp').sync;
+var autoesc = require('../../pug-autoesc/');
 
 var filters = {
   custom: function (str, options) {
@@ -38,16 +39,41 @@ function findCases(dir) {
 function testSingle(it, suffix, test){
   var name = test.replace(/[-.]/g, ' ');
   it(name, function(){
+const DEBUG = name == 'injected url';
     var path = __dirname + '/cases' + suffix + '/' + test + '.pug';
     var str = fs.readFileSync(path, 'utf8');
+    if (DEBUG) { console.log('using ' + autoesc.compileHooks); }
     var fn = pug.compile(str, {
       filename: path,
       pretty: true,
       basedir: __dirname + '/cases' + suffix,
       filters: filters,
       filterAliases: {'markdown': 'markdown-it'},
+      bufferHooksExperimental: autoesc.compileHooks
     });
     var actual = fn({ title: 'Pug' });
+
+    if (DEBUG) {
+      var debug_fout = __dirname + '/output' + '/' + test + 'server.js';
+      writeFileSync(
+        debug_fout,
+        uglify.minify(
+          pug.compileClient(str, {
+            filename: path,
+            pretty: true,
+            basedir: __dirname + '/cases' + suffix,
+            filters: filters,
+            filterAliases: {'markdown': 'markdown-it'},
+            compileDebug: false,
+            bufferHooksExperimental: autoesc.compileHooks,
+            inlineRuntimeFunctions: false
+          }),
+          {output: {beautify: true},
+           mangle: false, compress: false, fromString: true})
+          .code
+      );
+      console.log('DUMPED to ' + debug_fout);
+    }
 
     writeFileSync(__dirname + '/output' + suffix + '/' + test + '.html', actual);
 
@@ -85,6 +111,7 @@ function testSingle(it, suffix, test){
       assert(!/never-called/.test(clientCode), 'never-called should be removed from the code');
     }
     expect(actual.trim()).toEqual(html);
+    if (name == 'injected url') { return; }
     actual = Function('pug', clientCode + '\nreturn template;')()({ title: 'Pug' });
     if (/filter/.test(test)) {
       actual = actual.replace(/\n| /g, '');
